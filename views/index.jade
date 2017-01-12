@@ -16,9 +16,9 @@ block content
         message(ng-switch, on='message.type', self="nickname" ,scrolltothis="scrollToBottom()" ,info="message",ng-repeat='message in messages')
 
       .panel-footer
-        form.post-form.form-inline(novalidate='', name='postform')
-          input.form-control(type='text', ng-model='content', placeholder='说点什么呗', required='')
-          button.btn.btn-success(type='submit',ng-click='sendMessage()') 发送
+        form.post-form.form-inline(novalidate, name='postform')
+          input.form-control(type='text', ng-model='content', placeholder='说点什么呗', required)
+          button.btn.btn-success(type='submit',ng-click='sendMessage()',ng-disabled="postform.$invalid") 发送
   div.userform-wrapper(ng-show='!hasLogined')
     form
       input(type='text',name='nickname',ng-model='nickname')
