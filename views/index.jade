@@ -1,0 +1,37 @@
+extends layout
+block content
+  .chat-room-wrapper(ng-show='hasLogined')
+    .online.panel.panel-success
+      .panel-heading
+        h3.panel-title
+          | 在线
+          span.user-number {{users.length-1}}({{nickname}})
+      .user-wrapper.panel-body
+        .user(ng-click='setReceiver(user)',ng-repeat='user in users')
+          span.avatar
+          span.nickname {{ user.nickname?user.nickname:"群聊" }}
+          span.unread(ng-show="user.hasNewMessage") [未读]
+    .chat-room.panel.panel-success
+      .panel-heading
+        h3.panel-title {{receiver?receiver:"群聊"}}
+      #msg_list.message-wrapper.panel-body
+        div(ng-switch, on='message.type', ng-repeat='message in messages',scrolltothis="scrollToBottom()" )
+          div.system-notification(ng-switch-when='welcome') {{message.content}} 加入聊天室
+          div.system-notification(ng-switch-when='bye') {{message.content}} 退出聊天室
+          div.normal-message(ng-switch-when='normal',ng-class='{others:nickname!==message.from,self:nickname===message.from}')
+            .name-wrapper
+              span {{message.from}} @
+              span {{message.time |  date: 'HH:mm:ss' }}
+            .content-wrapper
+              span.content {{message.content}}
+              span.avatar
+
+      .panel-footer
+        form.post-form.form-inline(novalidate='', name='postform')
+          input.form-control(type='text', ng-model='content', placeholder='说点什么呗', required='')
+          button.btn.btn-success(type='submit',ng-click='sendMessage()') 发送
+  div.userform-wrapper(ng-show='!hasLogined')
+    form
+      input(type='text',name='nickname',ng-model='nickname')
+      input(type='submit',value='提交',ng-click='login()')
+      span.error(ng-show='error') 该昵称已经被使用了
