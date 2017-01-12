@@ -153,9 +153,19 @@ app.directive('message', ['$timeout', function ($timeout) {
     return {
         restrict: 'E',
         templateUrl: '/temp/message',
+        scope:{
+            info:"=",
+            self:"=",
+            scrolltothis:"&"
+        },
         replace:true,
         link:function(scope, elem, attrs){
-            $timeout(scope.scrollToBottom);
+            scope.time=new Date();
+            $timeout(scope.scrolltothis);
+            console.log(scope,elem,attrs);
+            $timeout(function(){
+                elem.find('.avatar').css('background',"#000");
+            });
         }
     };
 }])
@@ -166,6 +176,11 @@ app.directive('message', ['$timeout', function ($timeout) {
             scope:{
                 info:"="
             },
-            replace:true
+            replace:true,
+            link:function(scope, elem, attrs,chatCtrl){
+                $timeout(function(){
+                    elem.find('.avatar').css('background','#fff');
+                });
+            }
         };
     }]);
