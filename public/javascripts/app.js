@@ -21,12 +21,28 @@ app.factory('socket', function ($rootScope) {
         }
     }
 });
-app.controller("chatCtrl", ['$scope', 'socket', function ($scope, socket) {
+app.factory('userService', function($rootScope){
+    return{
+        get: function (users,nickname) {
+            for (var i = 0; i < users.length; i++)
+                if (users[i].nickname == nickname) {
+
+                    return users[i];
+                }
+                return null;
+        }
+    }
+})
+app.controller("chatCtrl", ['$scope', 'socket', 'userService','$timeout',function ($scope, socket, userService, $timeout) {
     $scope.hasLogined = false;
+    var messageWrapper= $('.message-wrapper');
     $scope.error = false;
     $scope.publicMessages = [];
     $scope.privateMessages = {};
     $scope.messages = $scope.publicMessages;
+    $scope.scrollToBottom=function(){
+        messageWrapper.scrollTop(messageWrapper[0].scrollHeight);
+    }
     $scope.setReceiver = function (user) {
         $scope.receiver = user.nickname;
         //点击私信
@@ -34,21 +50,17 @@ app.controller("chatCtrl", ['$scope', 'socket', function ($scope, socket) {
             if (!$scope.privateMessages[$scope.receiver])
                 $scope.privateMessages[$scope.receiver] = []
             $scope.messages = $scope.privateMessages[$scope.receiver];
-            for (var i = 0; i < $scope.users.length; i++)
-                if ($scope.users[i].nickname == user.nickname) {
-                    $scope.users[i].hasNewMessage = false;
-                    break
-                }
+            var user = userService.get($scope.users, user.nickname);
+            user.hasNewMessage=false;
+
         }
         //点击群发
         else {
             $scope.messages = $scope.publicMessages;
-            for (var i = 0; i < $scope.users.length; i++)
-                if ($scope.users[i].nickname == '') {
-                    $scope.users[i].hasNewMessage = false;
-                    break;
-                }
+            var user = userService.get($scope.users, '');
+            user.hasNewMessage=false;
         }
+
     };
     $scope.sendMessage = function () {
         var msg = {
@@ -110,12 +122,8 @@ app.controller("chatCtrl", ['$scope', 'socket', function ($scope, socket) {
         console.log('messageAdded', data);
         //私信
         if (data.to) {
-            for (var i = 0; i < $scope.users.length; i++)
-                if ($scope.users[i].nickname == data.from) {
-                    $scope.users[i].hasNewMessage = true;
-                    break;
-                }
-            $scope.users.hasNewMessage = true;
+            var user = userService.get($scope.users, data.from);
+            user.hasNewMessage=true;
             if (!$scope.privateMessages[data.from])
                 $scope.privateMessages[data.from] = [];
             $scope.privateMessages[data.from].push({
@@ -128,11 +136,8 @@ app.controller("chatCtrl", ['$scope', 'socket', function ($scope, socket) {
         }
         //群发
         else {
-            for (var i = 0; i < $scope.users.length; i++)
-                if ($scope.users[i].nickname == '') {
-                    $scope.users[i].hasNewMessage = true;
-                    break;
-                }
+            var user = userService.get($scope.users, '');
+            user.hasNewMessage=true;
             $scope.publicMessages.push({
                 type: 'normal',
                 content: data.content,
@@ -145,6 +150,22 @@ app.controller("chatCtrl", ['$scope', 'socket', function ($scope, socket) {
     });
 }]);
 app.directive('message', ['$timeout', function ($timeout) {
+    return {
+        restrict: 'E',
+        templateUrl: '/temp/message',
+        replace:true,
+        link:function(scope, elem, attrs){
+            $timeout(scope.scrollToBottom);
+        }
+    };
 }])
     .directive('user', ['$timeout', function ($timeout) {
+        return {
+            restrict: 'E',
+            templateUrl: '/temp/directive',
+            scope:{
+                info:"="
+            },
+            replace:true
+        };
     }]);

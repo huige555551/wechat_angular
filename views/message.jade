@@ -1,0 +1,10 @@
+div
+    div.system-notification(ng-switch-when='welcome') {{message.content}} 加入聊天室
+    div.system-notification(ng-switch-when='bye') {{message.content}} 退出聊天室
+    div.normal-message(ng-switch-when='normal',ng-class='{others:nickname!==message.from,self:nickname===message.from}')
+        .name-wrapper
+            span {{message.from}} @
+            span {{message.time |  date: 'HH:mm:ss' }}
+        .content-wrapper
+            span.content {{message.content}}
+            span.avatar

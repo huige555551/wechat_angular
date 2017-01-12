@@ -1,0 +1,4 @@
+.user
+    span.avatar
+    span.nickname {{ info.nickname?info.nickname:"群聊" }}
+    span.unread(ng-show="info.hasNewMessage") [未读]

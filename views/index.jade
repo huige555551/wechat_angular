@@ -5,26 +5,15 @@ block content
       .panel-heading
         h3.panel-title
           | 在线
-          span.user-number {{users.length-1}}({{nickname}})
+          span.user-number {{users.length-1}}[{{nickname}}]
       .user-wrapper.panel-body
-        .user(ng-click='setReceiver(user)',ng-repeat='user in users')
-          span.avatar
-          span.nickname {{ user.nickname?user.nickname:"群聊" }}
-          span.unread(ng-show="user.hasNewMessage") [未读]
+        user(ng-repeat="user in users",info='user' ng-click='setReceiver(user)')
+
     .chat-room.panel.panel-success
       .panel-heading
         h3.panel-title {{receiver?receiver:"群聊"}}
       #msg_list.message-wrapper.panel-body
-        div(ng-switch, on='message.type', ng-repeat='message in messages',scrolltothis="scrollToBottom()" )
-          div.system-notification(ng-switch-when='welcome') {{message.content}} 加入聊天室
-          div.system-notification(ng-switch-when='bye') {{message.content}} 退出聊天室
-          div.normal-message(ng-switch-when='normal',ng-class='{others:nickname!==message.from,self:nickname===message.from}')
-            .name-wrapper
-              span {{message.from}} @
-              span {{message.time |  date: 'HH:mm:ss' }}
-            .content-wrapper
-              span.content {{message.content}}
-              span.avatar
+        message(ng-switch, on='message.type', ng-repeat='message in messages',scrolltothis='scrollToBottom()')
 
       .panel-footer
         form.post-form.form-inline(novalidate='', name='postform')

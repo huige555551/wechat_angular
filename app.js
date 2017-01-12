@@ -62,7 +62,12 @@ io.on('connection', function (socket) {
 app.get('/', function (req, res) {
     res.render('index');
 });
-
+app.get('/temp/directive',function (req,res) {
+    res.render('user');
+});
+app.get('/temp/message',function (req,res) {
+    res.render('message');
+});
 http.listen(3000, function () {
     console.log('listening on *:3000');
 });
